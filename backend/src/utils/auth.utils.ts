@@ -26,6 +26,6 @@ export function isAdmin(userRole: UserRole): userRole is UserRole.Admin {
   return userRole === UserRole.Admin;
 }
 
-export function isVendor(userRole: UserRole): userRole is UserRole.Vendor {
-  return userRole === UserRole.Vendor;
+export function isEditor(userRole: UserRole): userRole is UserRole.Editor {
+  return userRole === UserRole.Editor;
 }

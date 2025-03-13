@@ -1,7 +1,7 @@
 // src/auth/auth.controller.ts
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './auth.dto';
+import { UserDto } from './../user/users.dto';
 import { Response } from 'express';
 
 @Controller('auth')
@@ -9,27 +9,48 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  // @UseInterceptors(FileInterceptor('profile')) // Use 'profile' as the field name for the uploaded file
   async register(
-    @Res() response: Response,  // Move the required parameter before the optional one
-    @Body() authDto: AuthDto, 
-    // @UploadedFile() file?: Express.Multer.File // Optional profile image
+    @Res() response: Response, 
+    @Body() userDto: UserDto, 
   ) {
-    const result = await this.authService.register(authDto);
+    const result = await this.authService.register(userDto);
     return response.status(HttpStatus.OK).json({
       message: result.message,
       user: result.user,
     });
   }
-  
-
-  @Post('verify-otp')
-  async verifyOtp(@Body() authDto: AuthDto) {
-    return this.authService.verifyOtp(authDto);
-  }
 
   @Post('login')
-  async login(@Body() authDto: AuthDto) {
-    return this.authService.login(authDto);
+  async login(
+    @Res() response: Response,
+    @Body() loginDto: UserDto,
+  ) {
+    const result = await this.authService.login(loginDto);
+    return response.status(HttpStatus.OK).json({
+      message: result.message,
+      info: result.user,
+      token: result.token,
+    });
   }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(
+    @Body('email') email: string
+  ) {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body() body: { email: string; otp: string; newPassword: string }
+  ) {
+    return this.authService.verifyOtpAndResetPassword(
+      body.email,
+      body.otp,
+      body.newPassword
+    );
+  }
+
 }

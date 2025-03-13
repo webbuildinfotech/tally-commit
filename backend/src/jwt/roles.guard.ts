@@ -31,7 +31,8 @@ export class RolesGuard implements CanActivate {
 
       return true;
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      console.log(err);
+      throw err
     }
   }
 }
